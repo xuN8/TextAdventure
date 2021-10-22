@@ -1,5 +1,6 @@
 from nodes import *
 
+# BEGINNING
 responses_to_waiter = (
   give_waiter_sass,
   ignore_waiter,
@@ -20,7 +21,7 @@ follow_or_stay = (
 for response in responses_to_waiter:
   response.choices(*follow_or_stay)
 
-# Main tree
+
 go_outside.choices(
   stay_outside.choices(
     go_inside,
@@ -32,6 +33,7 @@ go_outside.choices(
   )
 )
 
+# DINING ROOM
 follow_waiter.choices(
   # Force player to accept the table
   refuse_table.choices(
@@ -40,8 +42,47 @@ follow_waiter.choices(
         order_now,
         order_later.choices(order_later, order_now)
       ),
-      look_at_phone.choices(look_at_phone, look_at_menu)
+      look_at_phone.choices(look_at_phone, look_at_menu),
+      play_with_knives.choices(
+        run_to_another_table.choices(
+          play_with_knives,
+          obey.choices(accept_table)
+        ),
+        obey
+      )
     )
   ),
   accept_table
+)
+
+reactions_to_getting_caught = (
+  defense_mode.choices(accept_defeat_and_take_food),
+  accept_defeat_and_take_food
+)
+
+order_now.choices(
+  do_activities_on_kids_menu.choices(*reactions_to_getting_caught),
+  play_on_phone.choices(*reactions_to_getting_caught)
+)
+
+accept_defeat_and_take_food.choices(
+  reject_food.choices(
+    accept_food,
+    order_now
+  ),
+  accept_food.choices(
+    eat.choices(
+      keep_eating.choices(
+        keep_eating, 
+        finish_eating
+      ),
+      finish_eating.choices(
+        pay.choices(
+          give_tip.choices(leave_restaurant),
+          no_tip.choices(give_tip)
+        ),
+        no_pay.choices(pay)
+      )
+    )
+  )
 )

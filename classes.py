@@ -1,3 +1,5 @@
+from sys import stdout
+from time import sleep
 '''
 Example Node go_outside:
 ...
@@ -17,24 +19,40 @@ go_outside = Node(
   children = [go_inside, stay_outside]
 )
 '''
-class Node:
+real_print = print
 
-  def __init__(self, menu, execution, prompt, callback=None, *args):
+def print(string):
+  for i in range(len(string)):
+    char = string[i]
+
+    stdout.write('\a'*3)
+    stdout.flush()
+    stdout.write(char)
+    stdout.flush()
+    if char == "\n":
+      sleep(0.2)
+    elif char in ".?!":
+      sleep(0.15)
+    elif char == ",":
+      sleep(0.1)
+    else:
+      sleep(0.04)
+  stdout.write('\n')
+
+class Node:
+  def __init__(self, menu, execution, prompt, callback=None):
     self.menu = menu
     self.execution = execution
     self.prompt = prompt
     self.callback = callback
     self.children = []
-    self.args = args
 
-  def execute(self):
+  def execute(self, text=True):
     if self.callback:
-      print("CALLBACK")
-      print(self.args)
-      self.callback(*self.args)
-
-    # Print output text
-    print("%s\n%s\n" %(self.execution, self.prompt))
+      self.callback()
+    if text:
+      # Print output text
+      print("%s\n%s\n" %(self.execution, self.prompt))
 
     children = self.children or []
     if len(children) > 0:
@@ -49,14 +67,13 @@ class Node:
         choice = input(menu)
 
         # Process input
-        if choice:
-          index = int(choice)-1
-          children[index].execute()
+        index = int(choice)-1
+        children[index].execute()
       except:
-        print("Oh noes, I think you messed up. Otra vez?")
-        self.execute()
+        real_print("Oh noes, something went wrong :/\nOtra vez?")
+        self.execute(False)
     else:
-      print("The End")
+      print("The End ६.ය.ን")
 
   def choices(self, *args):
     self.children = list(args)
